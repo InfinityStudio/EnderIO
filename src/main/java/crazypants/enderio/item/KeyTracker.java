@@ -6,12 +6,12 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ChatComponentTranslation;
 
 import org.lwjgl.input.Keyboard;
 
+import com.enderio.core.common.util.ChatUtil;
+
 import cpw.mods.fml.client.registry.ClientRegistry;
-import cpw.mods.fml.common.FMLCommonHandler;
 import cpw.mods.fml.common.eventhandler.SubscribeEvent;
 import cpw.mods.fml.common.gameevent.InputEvent.KeyInputEvent;
 import crazypants.enderio.EnderIO;
@@ -21,6 +21,7 @@ import crazypants.enderio.item.PacketMagnetState.SlotType;
 import crazypants.enderio.item.darksteel.DarkSteelController;
 import crazypants.enderio.item.darksteel.DarkSteelItems;
 import crazypants.enderio.item.darksteel.PacketUpgradeState;
+import crazypants.enderio.item.darksteel.PacketUpgradeState.Type;
 import crazypants.enderio.item.darksteel.SoundDetector;
 import crazypants.enderio.item.darksteel.upgrade.JumpUpgrade;
 import crazypants.enderio.item.darksteel.upgrade.SoundDetectorUpgrade;
@@ -35,31 +36,23 @@ public class KeyTracker {
 
   public static final KeyTracker instance = new KeyTracker();
   
-  static {
-    FMLCommonHandler.instance().bus().register(instance);
-  }
+  private final KeyBinding glideKey;
   
-  private KeyBinding glideKey;  
-  private boolean isGlideActive = false;
+  private final KeyBinding soundDetectorKey;
   
-  private KeyBinding soundDetectorKey;  
-  private boolean isSoundDectorActive = false;
+  private final KeyBinding nightVisionKey;
   
-  private KeyBinding nightVisionKey;  
-  private boolean isNightVisionActive = false;
+  private final KeyBinding stepAssistKey;
   
-  private KeyBinding stepAssistKey;  
-  private boolean isStepAssistActive = true;
+  private final KeyBinding speedKey;
   
-  private KeyBinding speedKey;  
-  private boolean isSpeedActive = true;
+  private final KeyBinding jumpKey;
   
+  private final KeyBinding gogglesKey;
   
-  private KeyBinding gogglesKey;  
+  private final KeyBinding yetaWrenchMode;
   
-  private KeyBinding yetaWrenchMode;  
-  
-  private KeyBinding magnetKey;
+  private final KeyBinding magnetKey;
   
   public KeyTracker() {
     glideKey = new KeyBinding(EnderIO.lang.localize("keybind.glidertoggle"), Keyboard.KEY_G, EnderIO.lang.localize("category.darksteelarmor"));
@@ -77,6 +70,9 @@ public class KeyTracker {
     speedKey = new KeyBinding(EnderIO.lang.localize("keybind.speed"), Keyboard.KEY_NONE, EnderIO.lang.localize("category.darksteelarmor"));
     ClientRegistry.registerKeyBinding(speedKey);
     
+    jumpKey = new KeyBinding(EnderIO.lang.localize("keybind.jump"), Keyboard.KEY_NONE, EnderIO.lang.localize("category.darksteelarmor"));
+    ClientRegistry.registerKeyBinding(jumpKey);
+    
     yetaWrenchMode = new KeyBinding(EnderIO.lang.localize("keybind.yetawrenchmode"), Keyboard.KEY_Y, EnderIO.lang.localize("category.tools"));
     ClientRegistry.registerKeyBinding(yetaWrenchMode);
 
@@ -93,7 +89,20 @@ public class KeyTracker {
     handleGoggles();
     handleStepAssist();
     handleSpeed();
+    handleJump();
     handleMagnet();
+  }
+
+  private void sendEnabledChatMessage(String messageBase, boolean isActive) {
+    String message = messageBase.concat(isActive ? ".enabled" : ".disabled");
+    ChatUtil.sendNoSpamClientUnloc(EnderIO.lang, message);
+  }
+
+  private void toggleDarkSteelController(Type type, String messageBase) {
+    boolean isActive = !DarkSteelController.instance.isActive(Minecraft.getMinecraft().thePlayer, type);
+    sendEnabledChatMessage(messageBase, isActive);
+    DarkSteelController.instance.setActive(Minecraft.getMinecraft().thePlayer, type, isActive);
+    PacketHandler.INSTANCE.sendToServer(new PacketUpgradeState(type, isActive));
   }
 
   private void handleMagnet() {
@@ -122,21 +131,21 @@ public class KeyTracker {
     }
   }
 
+  private void handleJump() {
+    if(!JumpUpgrade.isEquipped(Minecraft.getMinecraft().thePlayer)) {
+      return;
+    }
+    if(jumpKey.isPressed()) {
+      toggleDarkSteelController(Type.JUMP, "darksteel.upgrade.jump");
+    }
+  }
+
   private void handleSpeed() {
     if(!SpeedUpgrade.isEquipped(Minecraft.getMinecraft().thePlayer)) {
       return;
     }
-    if(speedKey.isPressed()) {      
-      isSpeedActive = !isSpeedActive;
-      String message;
-      if(isSpeedActive) {
-        message = EnderIO.lang.localize("darksteel.upgrade.speed.enabled");
-      } else {
-        message = EnderIO.lang.localize("darksteel.upgrade.speed.disabled");
-      }
-      Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentTranslation(message));
-      DarkSteelController.instance.setSpeedActive(Minecraft.getMinecraft().thePlayer, isSpeedActive);
-      PacketHandler.INSTANCE.sendToServer(new PacketUpgradeState(PacketUpgradeState.Type.SPEED, isSpeedActive));
+    if(speedKey.isPressed()) {
+      toggleDarkSteelController(Type.SPEED, "darksteel.upgrade.speed");
     }
   }
 
@@ -144,19 +153,9 @@ public class KeyTracker {
     if(!JumpUpgrade.isEquipped(Minecraft.getMinecraft().thePlayer)) {
       return;
     }
-    if(stepAssistKey.isPressed()) {      
-      isStepAssistActive = !isStepAssistActive;
-      String message;
-      if(isStepAssistActive) {
-        message = EnderIO.lang.localize("darksteel.upgrade.stepAssist.enabled");
-      } else {
-        message = EnderIO.lang.localize("darksteel.upgrade.stepAssist.disabled");
-      }
-      Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentTranslation(message));
-      DarkSteelController.instance.setStepAssistActive(Minecraft.getMinecraft().thePlayer, isStepAssistActive);
-      PacketHandler.INSTANCE.sendToServer(new PacketUpgradeState(PacketUpgradeState.Type.STEP_ASSIST, isStepAssistActive));
+    if(stepAssistKey.isPressed()) {
+      toggleDarkSteelController(Type.STEP_ASSIST, "darksteel.upgrade.stepAssist");
     }
-    
   }
 
   private void handleGoggles() {
@@ -164,10 +163,11 @@ public class KeyTracker {
     if(!GogglesOfRevealingUpgrade.isUpgradeEquipped(player)){
       return;
     }
-    if(gogglesKey.isPressed()) {      
-      DarkSteelItems.itemDarkSteelHelmet.setGogglesUgradeActive(!DarkSteelItems.itemDarkSteelHelmet.isGogglesUgradeActive());
+    if(gogglesKey.isPressed()) {
+      boolean isActive = !DarkSteelItems.itemDarkSteelHelmet.isGogglesUgradeActive();
+      sendEnabledChatMessage("darksteel.upgrade.goggles", isActive);
+      DarkSteelItems.itemDarkSteelHelmet.setGogglesUgradeActive(isActive);
     }
-    
   }
 
   private void handleYetaWrench() {
@@ -194,9 +194,7 @@ public class KeyTracker {
       PacketHandler.INSTANCE.sendToServer(new PacketConduitProbeMode());   
       player.swingItem();
       
-    }
-    
-        
+    }    
   }
 
   private void handleSoundDetector() {
@@ -204,59 +202,38 @@ public class KeyTracker {
       SoundDetector.instance.setEnabled(false);
       return;
     }
-    if(soundDetectorKey.isPressed()) {      
-      isSoundDectorActive = !isSoundDectorActive;
-      String message;
-      if(isSoundDectorActive) {
-        message = EnderIO.lang.localize("darksteel.upgrade.sound.enabled");
-      } else {
-        message = EnderIO.lang.localize("darksteel.upgrade.sound.disabled");
-      }
-      Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentTranslation(message));
-      SoundDetector.instance.setEnabled(isSoundDectorActive);
+    if(soundDetectorKey.isPressed()) {
+      boolean isActive = !SoundDetector.instance.isEnabled();
+      sendEnabledChatMessage("darksteel.upgrade.sound", isActive);
+      SoundDetector.instance.setEnabled(isActive);
     }
-    
   }
 
   private void handleGlide() {
     if(!DarkSteelController.instance.isGliderUpgradeEquipped(Minecraft.getMinecraft().thePlayer)) {
       return;
     }
-    if(glideKey.isPressed()) {      
-      isGlideActive = !isGlideActive;
-      String message;
-      if(isGlideActive) {
-        message = EnderIO.lang.localize("darksteel.upgrade.glider.enabled");
-      } else {
-        message = EnderIO.lang.localize("darksteel.upgrade.glider.disabled");
-      }
-      Minecraft.getMinecraft().thePlayer.addChatComponentMessage(new ChatComponentTranslation(message));
-      DarkSteelController.instance.setGlideActive(Minecraft.getMinecraft().thePlayer, isGlideActive);
-      PacketHandler.INSTANCE.sendToServer(new PacketUpgradeState(PacketUpgradeState.Type.GLIDE, isGlideActive));
+    if(glideKey.isPressed()) {
+      toggleDarkSteelController(Type.GLIDE, "darksteel.upgrade.glider");
     }
   }
   
   private void handleNightVision() {
     EntityPlayer player = Minecraft.getMinecraft().thePlayer;
     if(!DarkSteelController.instance.isNightVisionUpgradeEquipped(player)){
-      isNightVisionActive = false;
       return;
     }
-    if(nightVisionKey.isPressed()) {      
-      isNightVisionActive = !isNightVisionActive;
-      if(isNightVisionActive) {
+    if(nightVisionKey.isPressed()) {
+      boolean isActive = !DarkSteelController.instance.isNightVisionActive();
+      if(isActive) {
         player.worldObj.playSound(player.posX, player.posY, player.posZ, EnderIO.MODID + ":ds.nightvision.on", 0.1f, player.worldObj.rand.nextFloat() * 0.4f - 0.2f + 1.0f, false);
       } else {
         player.worldObj.playSound(player.posX, player.posY, player.posZ, EnderIO.MODID + ":ds.nightvision.off", 0.1f, 1.0f, false);
       }
-      DarkSteelController.instance.setNightVisionActive(isNightVisionActive);      
+      DarkSteelController.instance.setNightVisionActive(isActive);
     }
   }
 
-  public boolean isGlideActive() {
-    return isGlideActive;
-  }   
-    
   public boolean isSoundDetectorUpgradeEquipped(EntityClientPlayerMP player) {
     ItemStack helmet = player.getEquipmentInSlot(4);
     SoundDetectorUpgrade upgrade = SoundDetectorUpgrade.loadFromItem(helmet);

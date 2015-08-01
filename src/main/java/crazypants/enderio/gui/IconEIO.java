@@ -1,14 +1,10 @@
 package crazypants.enderio.gui;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
 import net.minecraft.util.ResourceLocation;
 
 import com.enderio.core.api.client.render.IWidgetIcon;
 import com.enderio.core.api.client.render.IWidgetMap;
 
-@AllArgsConstructor
-@Getter
 public enum IconEIO implements IWidgetIcon {
 
   TICK(0, 192),
@@ -63,6 +59,12 @@ public enum IconEIO implements IWidgetIcon {
   FILTER_META_OFF(208, 224),
   FILTER_NBT_OFF(224, 224),
   FILTER_ORE_DICT_OFF(240, 224),
+
+  FILTER_FUZZY_DISABLED(240, 176),
+  FILTER_FUZZY_25(224, 176),
+  FILTER_FUZZY_50(208, 176),
+  FILTER_FUZZY_75(192, 176),
+  FILTER_FUZZY_99(176, 176),
 
   @Deprecated
   INPUT_OLD(128, 197 + 32, 30, 14),
@@ -143,8 +145,41 @@ public enum IconEIO implements IWidgetIcon {
     this(x, y, width, height, null);
   }
 
+  private IconEIO(int x, int y, int width, int height, IconEIO overlay) {
+    this.x = x;
+    this.y = y;
+    this.width = width;
+    this.height = height;
+    this.overlay = overlay;
+  }
+
   @Override
   public IWidgetMap getMap() {
     return map;
+  }
+
+  @Override
+  public int getX() {
+    return x;
+  }
+
+  @Override
+  public int getY() {
+    return y;
+  }
+
+  @Override
+  public int getWidth() {
+    return width;
+  }
+
+  @Override
+  public int getHeight() {
+    return height;
+  }
+
+  @Override
+  public IconEIO getOverlay() {
+    return overlay;
   }
 }

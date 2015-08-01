@@ -428,6 +428,18 @@ enderio.tank.tank=Tank
 enderio.tooltip.none=None
 enderio.tooltip.fluidStored=Fluid Stored
 
+enderio.gui.tooltip.voidslot=Void Slot
+enderio.gui.void.mode=Void Mode
+
+enderio.gui.void.mode.always=Always
+enderio.gui.void.mode.always.desc=Void slot accepts all items
+
+enderio.gui.void.mode.if_not_container=If Not Container
+enderio.gui.void.mode.if_not_container.desc=Void slot accepts all items that are not fluid containers
+
+enderio.gui.void.mode.never=Never
+enderio.gui.void.mode.never.desc=Void slot does not accept items
+
 tile.blockCrafter.name=Crafter
 tile.blockCrafter.tooltip.detailed.line1=A powered auto-crafter
 tile.blockCrafter.tooltip.detailed.line2=Consumes power per operation
@@ -736,6 +748,8 @@ enderio.darksteel.upgrade.sound.disabled=Sound Locator Disabled
 
 enderio.darksteel.upgrade.gogglesOfRevealing.name=Revealing
 enderio.darksteel.upgrade.gogglesOfRevealing.tooltip.detailed.line1=Vis Discount: 5%
+enderio.darksteel.upgrade.gogglesOfRevealing.enabled=Magic is being revealed
+enderio.darksteel.upgrade.gogglesOfRevealing.disabled=Magic is hidden from plain sight
 
 enderio.darksteel.upgrade.naturalistEye.name=Naturalist's Eye
 enderio.darksteel.upgrade.naturalistEye.tooltip.detailed.line1=Shows pollinated tree leaves
@@ -756,6 +770,9 @@ item.itemGliderWing.name=Glider Wing
 item.itemGliderWings.name=Glider Wings
 item.itemGliderWings.tooltip.detailed.line1=Upgrade for Dark Steel
 item.itemGliderWings.tooltip.detailed.line2=chestplate
+
+enderio.darksteel.upgrade.jump.enabled=Jump Enabled
+enderio.darksteel.upgrade.jump.disabled=Jump Disabled
 
 enderio.darksteel.upgrade.jump_one.name=Jump
 enderio.darksteel.upgrade.jump_one.tooltip.detailed.line1=Increases step and jump height
@@ -994,6 +1011,12 @@ enderio.gui.conduit.item.roundRobinEnabled=Round Robin Enabled
 enderio.gui.conduit.item.roundRobinDisabled=Round Robin Disabled
 enderio.gui.conduit.item.priority=Priority
 
+enderio.gui.conduit.item.fuzzy.disabled=Fuzzy Mode disabled
+enderio.gui.conduit.item.fuzzy.fuzzy_25=Fuzzy match for 25% damage
+enderio.gui.conduit.item.fuzzy.fuzzy_50=Fuzzy match for 50% damage
+enderio.gui.conduit.item.fuzzy.fuzzy_75=Fuzzy match for 75% damage
+enderio.gui.conduit.item.fuzzy.fuzzy_99=Fuzzy match for any damage
+
 enderio.gui.conduit.item.filterupgrade=Insert Item Filter
 enderio.gui.conduit.item.speedupgrade=Insert Item Conduit Speed Upgrades/Downgrade
 enderio.gui.conduit.item.speedupgrade2=Max upgrades is 15; Max downgrades is 1
@@ -1074,6 +1097,7 @@ enderio.keybind.gogglesofrevealing=Goggles of Revealing
 enderio.keybind.nightvision=Night Vision
 enderio.keybind.soundlocator=Sound Locator
 enderio.keybind.speed=Speed
+enderio.keybind.jump=Jump
 enderio.keybind.stepassist=Step Assist
 enderio.keybind.yetawrenchmode=Yeta Wrench Mode
 enderio.keybind.magnet=Toggle Electromagnet

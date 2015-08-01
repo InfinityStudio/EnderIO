@@ -306,7 +306,7 @@ public final class Config {
       "BiomesOPlenty:hoeAmethyst", "BiomesOPlenty:hoeMud",
       "Eln:Eln.Copper Hoe",
       "Thaumcraft:ItemHoeThaumium", "Thaumcraft:ItemHoeElemental", "Thaumcraft:ItemHoeVoid",
-      "ThermalExpansion:tool.hoeInvar"
+      "ThermalFoundation:tool.hoeInvar"
   };
   public static List<ItemStack> farmHoes = new ArrayList<ItemStack>();
   public static int farmSaplingReserveAmount = 8;
@@ -521,6 +521,7 @@ public final class Config {
     if (event.modID.equals(EnderIO.MODID)) {
       Log.info("Updating config...");
       syncConfig(false);
+      init();
       postInit();
     }
   }
@@ -531,6 +532,7 @@ public final class Config {
       Log.info("Updating config...");
       syncConfig(true);
       event.setSuccessful();
+      init();
       postInit();
     }
   }
